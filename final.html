@@ -1,0 +1,418 @@
+
+<meta charset="utf-8" emacsmode="-*- markdown -*-"><link rel="stylesheet" href="https://casual-effects.com/markdeep/latest/apidoc.css?">
+
+                          **ESP32 Chess: Final Report**
+
+This browser-renderable file is intended to serve as a summary of our final project.
+
+# Video
+
+The follow video demonstrates the entire project and all its features in action.
+
+![ESP32 Chess](https://youtu.be/oWKp57RhSaI)
+
+# Overview
+
+For our final project, we've implemented a fully functioning chess application  which supports both local and remote online matches. For online matches, users
+have the option of either directly challenging other users, or of entering a queue, in which case they will be matched with random opponents also waiting in 
+the queue. We've also added some nice additional features, such as a rating system, a leaderboard, and user profile pages with match statistics.
+
+# Block Diagram
+
+## Main Menu
+
+The following diagram shows how the main menu system works. All menus we use follow a similar design.
+
+<svg width="800" height="600" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="271.5" cy="147.5" rx="30" ry="30"/>
+	<text x="200.5" y="153.5" font-family="Times New Roman" font-size="20">New Local Game</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="466.5" cy="147.5" rx="30" ry="30"/>
+	<text x="387.5" y="153.5" font-family="Times New Roman" font-size="20">New Remote Game</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="557.5" cy="327.5" rx="30" ry="30"/>
+	<text x="506.5" y="333.5" font-family="Times New Roman" font-size="20">Leaderboard</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="362.5" cy="447.5" rx="30" ry="30"/>
+	<text x="297.5" y="453.5" font-family="Times New Roman" font-size="20">Ongoing Games</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="172.5" cy="317.5" rx="30" ry="30"/>
+	<text x="128.5" y="323.5" font-family="Times New Roman" font-size="20">Challenges</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="110.5" cy="45.5" rx="30" ry="30"/>
+	<text x="18.5" y="51.5" font-family="Times New Roman" font-size="20">Start New Local Game</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="681.5" cy="45.5" rx="30" ry="30"/>
+	<text x="594.5" y="51.5" font-family="Times New Roman" font-size="20">Open Queue Controls</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="674.5" cy="219.5" rx="30" ry="30"/>
+	<text x="599.5" y="225.5" font-family="Times New Roman" font-size="20">Open Leaderboard</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="627.5" cy="527.5" rx="30" ry="30"/>
+	<text x="538.5" y="533.5" font-family="Times New Roman" font-size="20">Open Ongoing Games</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="109.5" cy="506.5" rx="30" ry="30"/>
+	<text x="40.5" y="512.5" font-family="Times New Roman" font-size="20">Open Challenges</text>
+	<polygon stroke="black" stroke-width="1" points="503.5,216.5 544.376,300.523"/>
+	<text x="371.5" y="207.5" font-family="Times New Roman" font-size="20">button 1 pushed</text>
+	<polygon fill="black" stroke-width="1" points="544.376,300.523 545.372,291.142 536.38,295.516"/>
+	<polygon stroke="black" stroke-width="1" points="496.5,390.5 390.106,435.757"/>
+	<text x="503.5" y="387.5" font-family="Times New Roman" font-size="20">button 1 pushed</text>
+	<polygon fill="black" stroke-width="1" points="390.106,435.757 399.425,437.227 395.511,428.025"/>
+	<polygon stroke="black" stroke-width="1" points="314.5,392.5 199.027,331.511"/>
+	<text x="321.5" y="410.5" font-family="Times New Roman" font-size="20">button 1 pushed</text>
+	<polygon fill="black" stroke-width="1" points="199.027,331.511 203.766,339.668 208.436,330.826"/>
+	<polygon stroke="black" stroke-width="1" points="198.5,247.5 253.812,171.731"/>
+	<text x="65.5" y="268.5" font-family="Times New Roman" font-size="20">button 1 pushed</text>
+	<polygon fill="black" stroke-width="1" points="253.812,171.731 245.056,175.244 253.133,181.14"/>
+	<polygon stroke="black" stroke-width="1" points="284.5,118.5 436.874,142.779"/>
+	<text x="149.5" y="122.5" font-family="Times New Roman" font-size="20">button 1 pushed</text>
+	<polygon fill="black" stroke-width="1" points="436.874,142.779 429.76,136.583 428.187,146.458"/>
+	<polygon stroke="black" stroke-width="1" points="192.5,82.5 137.845,57.839"/>
+	<text x="199.5" y="98.5" font-family="Times New Roman" font-size="20">button 2 pushed</text>
+	<polygon fill="black" stroke-width="1" points="137.845,57.839 143.081,65.687 147.194,56.571"/>
+	<polygon stroke="black" stroke-width="1" points="548.5,93.5 653.282,55.684"/>
+	<text x="413.5" y="107.5" font-family="Times New Roman" font-size="20">button 2 pushed</text>
+	<polygon fill="black" stroke-width="1" points="653.282,55.684 644.059,53.697 647.454,63.103"/>
+	<polygon stroke="black" stroke-width="1" points="608.5,270.5 650.761,237.843"/>
+	<text x="475.5" y="290.5" font-family="Times New Roman" font-size="20">button 2 pushed</text>
+	<polygon fill="black" stroke-width="1" points="650.761,237.843 641.374,238.779 647.488,246.691"/>
+	<polygon stroke="black" stroke-width="1" points="440.5,502.5 597.765,523.525"/>
+	<text x="305.5" y="506.5" font-family="Times New Roman" font-size="20">button 2 pushed</text>
+	<polygon fill="black" stroke-width="1" points="597.765,523.525 590.498,517.509 589.173,527.42"/>
+	<polygon stroke="black" stroke-width="1" points="147.5,386.5 118.557,477.9"/>
+	<text x="143.5" y="374.5" font-family="Times New Roman" font-size="20">button 2 pushed</text>
+	<polygon fill="black" stroke-width="1" points="118.557,477.9 125.739,471.782 116.205,468.764"/>
+</svg>
+
+## In Game
+
+Here is the high level state machine for gameplay.
+
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="800" height="600" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="223.5" cy="246.5" rx="30" ry="30"/>
+	<text x="126.5" y="252.5" font-family="Times New Roman" font-size="20">Selecting Piece to Move</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="554.5" cy="149.5" rx="30" ry="30"/>
+	<text x="449.5" y="155.5" font-family="Times New Roman" font-size="20">Selecting Where To Move</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="460.5" cy="434.5" rx="30" ry="30"/>
+	<text x="386.5" y="440.5" font-family="Times New Roman" font-size="20">Waiting For Move</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="330.5" cy="101.5" rx="30" ry="30"/>
+	<text x="250.5" y="107.5" font-family="Times New Roman" font-size="20">Increment Selection</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="356.5" cy="546.5" rx="30" ry="30"/>
+	<text x="281.5" y="552.5" font-family="Times New Roman" font-size="20">GET Current State</text>
+	<ellipse stroke="black" stroke-width="1" fill="none" cx="93.5" cy="419.5" rx="30" ry="30"/>
+	<text x="47.5" y="425.5" font-family="Times New Roman" font-size="20">Game Over</text>
+	<polygon stroke="black" stroke-width="1" points="241.313,222.361 312.687,125.639"/>
+	<polygon fill="black" stroke-width="1" points="312.687,125.639 303.914,129.107 311.96,135.045"/>
+	<text x="282.5" y="193.5" font-family="Times New Roman" font-size="20">button 1 pushed</text>
+	<polygon stroke="black" stroke-width="1" points="303.5,114.5 239.049,220.844"/>
+	<polygon fill="black" stroke-width="1" points="239.049,220.844 247.471,216.594 238.919,211.411"/>
+	<polygon stroke="black" stroke-width="1" points="525.166,143.214 359.834,107.786"/>
+	<polygon fill="black" stroke-width="1" points="359.834,107.786 366.609,114.351 368.704,104.573"/>
+	<text x="420.5" y="110.5" font-family="Times New Roman" font-size="20">button 1 pushed</text>
+	<polygon stroke="black" stroke-width="1" points="351.5,128.5 524.659,146.413"/>
+	<polygon fill="black" stroke-width="1" points="524.659,146.413 517.216,140.616 516.187,150.563"/>
+	<polygon stroke="black" stroke-width="1" points="252.289,238.063 525.711,157.937"/>
+	<polygon fill="black" stroke-width="1" points="525.711,157.937 516.627,155.388 519.44,164.985"/>
+	<text x="381.5" y="222.5" font-family="Times New Roman" font-size="20">button 2 pushed</text>
+	<polygon stroke="black" stroke-width="1" points="545.103,177.99 469.897,406.01"/>
+	<polygon fill="black" stroke-width="1" points="469.897,406.01 477.151,399.978 467.654,396.846"/>
+	<text x="372.5" y="291.5" font-family="Times New Roman" font-size="20">button 2 pushed</text>
+	<polygon stroke="black" stroke-width="1" points="440.086,456.484 376.914,524.516"/>
+	<polygon fill="black" stroke-width="1" points="376.914,524.516 386.021,522.056 378.693,515.252"/>
+	<text x="182.5" y="481.5" font-family="Times New Roman" font-size="20">button 1 or button 2 pushed</text>
+	<polygon stroke="black" stroke-width="1" points="390.5,535.5 443.411,459.157"/>
+	<polygon fill="black" stroke-width="1" points="443.411,459.157 434.744,462.884 442.963,468.58"/>
+	<polygon stroke="black" stroke-width="1" points="436.997,415.856 247.003,265.144"/>
+	<polygon fill="black" stroke-width="1" points="247.003,265.144 250.163,274.033 256.378,266.198"/>
+	<text x="27.5" y="331.5" font-family="Times New Roman" font-size="20">if move was made and game should continue</text>
+	<polygon stroke="black" stroke-width="1" points="430.525,433.275 123.475,420.725"/>
+	<polygon fill="black" stroke-width="1" points="123.475,420.725 131.264,426.048 131.672,416.056"/>
+	<text x="122.5" y="411.5" font-family="Times New Roman" font-size="20">if move was made and game should end</text>
+</svg>
+
+
+# UI/UX and Gameplay
+
+## Drawing Board/Pieces
+
+The board is drawn with a simple for loop:
+
+~~~~~~~~~~
+void drawBoard() {
+  for (int row = 0; row < 8; row++) {
+    for (int col = 0; col < 8; col++) {
+      tft.fillRect(BOARD_TOP_LEFT_X + col * CELL_SIZE, BOARD_TOP_LEFT_Y + row * CELL_SIZE,
+                   CELL_SIZE, CELL_SIZE,
+                   (row + col) % 2 == 0 ? LIGHT_SQUARE : DARK_SQUARE);
+    }
+  }
+}
+~~~~~~~~~~
+
+Each individual piece is hardcoded into a $15\times 15$ array representing its pixel-by-pixel makeup. For example, here is the knight (can you see it?):
+
+~~~~~~~~~~~
+static const uint8_t PROGMEM knight[225] = {
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,
+0,0,0,0,1,2,2,2,2,1,1,0,0,0,0,
+0,0,0,0,1,2,1,2,2,2,2,1,0,0,0,
+0,0,0,1,2,2,2,2,2,2,2,2,1,0,0,
+0,0,0,1,2,2,2,2,2,2,2,2,1,0,0,
+0,0,1,2,2,2,1,1,2,2,2,2,1,0,0,
+0,0,1,2,2,1,0,1,2,2,2,2,1,0,0,
+0,0,0,1,1,0,0,1,2,2,2,2,1,0,0,
+0,0,0,0,0,0,1,2,2,2,2,2,1,0,0,
+0,0,0,0,0,0,1,2,2,2,2,2,1,0,0,
+0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+};
+~~~~~~~~~~~
+
+To draw a piece at a board square is then a simple, one line function:
+
+~~~~~~~~~~
+void drawPiece(const uint8_t* piece, int col, int row, bool color) {
+  uint8_t sq_x = BOARD_TOP_LEFT_X + col * CELL_SIZE;
+  uint8_t sq_y = BOARD_TOP_LEFT_Y + row * CELL_SIZE;
+  for (uint8_t i = 0; i < CELL_SIZE * CELL_SIZE; i++) {
+    if (piece[i] > 0) tft.drawPixel(sq_x + i % CELL_SIZE, sq_y + i / CELL_SIZE, piece[i] == 1 ? (color ? TFT_WHITE : TFT_BLACK) : (color ? TFT_BLACK : TFT_WHITE));
+  }
+}
+~~~~~~~~~~
+
+## Drawing/Handling Board States
+
+Board states are represented by a $8\times 8$ array of integers, where each integer corresponds to a unique piece. The starting board, for example, is represented by:
+
+~~~~~~~~~~
+uint8_t start_state[64] = {
+  7, 3, 5, 9, 11, 5, 3, 7,
+  1, 1, 1, 1, 1, 1, 1, 1,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  2, 2, 2, 2, 2, 2, 2, 2,
+  8, 4, 6, 10, 12, 6, 4, 8
+};
+~~~~~~~~~~
+
+Drawing a board state is as simple as iterating over it:
+
+~~~~~~~~~~~
+const uint8_t *PIECES[13] = {nullptr, pawn, pawn, knight, knight, bishop, bishop, rook, rook, queen, queen, king, king};
+
+void drawBoardState(uint8_t* board_state) {
+  drawBoard();
+  for (int i = 0; i < 64; i++){
+    if (board_state[i] != 0) drawPiece(PIECES[board_state[i]], i % 8, i / 8, board_state[i] % 2); 
+  }
+}
+~~~~~~~~~~~
+
+## Handling Button Presses
+
+The button presses (for both buttons) are handled by a constantly running finite state machine, which runs on every iteration of the void loop(). 
+This allows button pressed to be called and referenced at any place in the program easily. Note that state 2 is the important state.
+
+~~~~~~~~
+void button_fsm(uint8_t PIN, uint8_t* button_state) {
+  uint8_t button = digitalRead(PIN);
+  switch (*button_state) {
+    case 0: // idle
+      if (button == LOW && millis() - timer > 10) {
+        *button_state = 1;
+        timer = millis();
+      }
+      break;
+    case 1: // pressing
+      if (button == HIGH && millis() - timer > 10) {
+        *button_state = 2;
+        timer = millis();
+      }
+      if (button == LOW && millis() - timer > 200) {
+        *button_state = 3;
+        timer = millis();
+      }
+      break;
+    case 2: // pressed and released, waiting to be acknowledged
+      break;
+    case 3: // in middle of long press
+      if (button == HIGH) {
+        *button_state = 2;
+        timer = millis();
+      }
+      break; // wait to be acknowledged then go to 1 or 4
+    case 4: 
+      if (button == HIGH) {
+        *button_state = 0;
+        timer = millis();
+      }
+      break;
+  }
+}
+~~~~~~~~
+
+## Getting Legal Moves
+
+When a move is submitted on the ESP32 it gets sent to our server. Each game has a unique 10 character ASCII id, 
+so the server references the last board state it has for that particular id. These board states are stored using
+FEN notation. The server takes the currently stored game state and applies the submitted move to it. 
+It then returns the board state along with a list of legal moves for the ESP32 to render. The ESP32 reads the legal moves into a $64\times 64$ array of
+booleans `legal_moves` such that `legal_moves[64*i + j]` is `true` iff the move from square `i` to `j` is legal. When selecting a piece, the legal squares of the currently selected piece are displayed so that a user can tell what moves they will be able to make before selecting it. 
+
+## Updating Game Information
+
+Along with the board state, the server also sends back game information: whether there is check, checkmate, stalemate, insufficient material, as well as 
+clock information. This is then passed to variables on the ESP32 which updates the clocks and behaves appropriately in endgame situations. On check (or checkmate), the king
+in check is highlighted in red.
+
+## Clocks
+
+The server requests keep track of and return clock information. These clocks are displayed on the appropriate side of the board (along with player names and ratings). They turn
+orange under 3 minutes and red under 1 minute. Every game assigns 10 minutes to each side automatically, but our API calls allow for manual adjustment
+of this if desired. 
+
+## Remote Player vs. Player
+. 
+Both local and remote games are given ids. The id allows the server the query the most recent board state of that game and append a move to it, as well as update
+the clock information based on it. The entire game state machine is a pretty informative look into how everything works:
+~~~~~~~~~~
+void pvp_move_fsm() {
+  switch (move_state) {
+    case 0: // selecting move_from
+      if (button 1 pushed) { 
+        increment_move_from();
+      }
+      if (button 2 pushed) { 
+        move_state = 1; // go to selecting move_to
+      }
+      break;
+    case 1: // selecting move_to
+      if (button 1 pushed) { // first button pushed
+        increment_move_to();
+      }
+      if (button 2 pushed) { // second button pushed
+        do_move(); // THIS POSTS THE MOVE FROM move_from TO move_to
+        player_color = is_local ? !player_color : player_color; // switch players if the game is local
+        move_state = 2; // go to wait for move
+      }
+      break;
+    case 2: // waiting for move, not currently your turn      
+      if (button 1 pushed or button 2 pushed) { // any button pushed
+        get_state(); // GET REQUEST
+      }
+      if (current_color == player_color) {
+        drawBoard();
+        move_state = 0; // if it's your turn, go to select move_from 
+      }
+      break;
+  }
+~~~~~~~~~~
+
+## Pawn Promotion
+
+There is a menu that pops up after advancing a pawn to the last rank, allowing a user to select which piece they would like to promote
+their pawn to.
+
+## Board Flipping
+
+There is a feature to flip the board, especially useful for the player playing black. It works by applying a transformation to the board when drawing it, shown below.
+~~~~~~~~
+void drawPiece(const uint8_t* piece, int col, int row, bool color) {
+  uint8_t sq_x = BOARD_TOP_LEFT_X + (!is_board_flipped ? col : 7-col) * CELL_SIZE; // transformation for flipped board
+  uint8_t sq_y = BOARD_TOP_LEFT_Y + (!is_board_flipped ? row : 7-row) * CELL_SIZE; // transformation for flipped board
+  for (uint8_t i = 0; i < CELL_SIZE * CELL_SIZE; i++) {
+    if (piece[i] > 0) tft.drawPixel(sq_x + i % CELL_SIZE, sq_y + i / CELL_SIZE, piece[i] == 1 ? (color ? TFT_WHITE : TFT_BLACK) : (color ? TFT_BLACK : TFT_WHITE));
+  }
+}
+~~~~~~~~
+
+
+# API calls
+
+
+* `GET games.py?player={p}` returns a list of ongoing games (separated by `&`) that player `p` is in, returning the players color, opponent, and game id (separated by `,`) for each game
+* `GET games.py?getplayers=1` returns a comma separated list of all players who have ever played a game
+* `POST games.py?newgame=1&id={id}&white={w}&black={b}` adds a new game with id id to the games database. __This also automatically performs a `newgame` call to `pvp.py`__
+* `POST games.py?gameover=1&id={id}&result={r}&color={c}` updates the result of the game with id id. Result is 1 if white wins, 2 if theres a draw, and 3 if black wins. This also posts the appropriate post to `elo.py`
+* `POST challenges.py?request=1&id={id}&requester={r}&accepter={a}` posts a challenge with id id from player `r` to player `a` that will create a game with id id if/when accepted
+* `POST challenges.py?accept=1&id={id}` updates the challenge with id id to be accepted. This also calls `POST games.py?newgame=1` with the relevant arguments.
+* `GET challenges.py?player={p}` returns a list of current challenges (separated by `&`) that player `p` is involved in, returning the players outgoing/incoming status (0 if incoming, 1 if outgoing), opponent, and game/challenge id (separated by `,`) for each challenge
+* `POST challenges.py?id={id}&decline=1` declines the challenge with id `id`
+* `POST pvp.py?id={id}&newgame=1&player={player_id}&local=1` adds a new local game to the pvp database.
+* `POST pvp.py?id={id}&resign=1&color={player_color}` lets `pvp.py` know that the player of color `player_color` in game `id` wants to resign.
+* `POST pvp.py?id={id}&start={move_from}&end=%{move_to}` lets `pvp.py` know that the player wants to move a piece from `move_from` to `move_to` in game `id`
+* `POST pvp.py?id={id}&start={move_from}&end={move_to}&promotion={promotion}` same as above, but in the case that the move results in a pawn promotion. `q` for queen, `r` for rook, `b` for bishop, `n` for knight.
+* `POST server.py?user={player_id}&type=queue&action=enter` puts player `player_id` in the queue.
+* `POST server.py?user={player_id}&type=queue&action=leave` removes palyer `player_id` from the queue.
+* `GET pvp.py?id={id}` gets the current game state of game `id`.
+* `GET elo.py?me={player_id}?opp={opp_id}` gets the ratings of the player and their opponent.
+* `GET games.py?getplayers=1` gets all players in the database.
+* `POST elo.py?newuser=1&user={user}` adds a new user with username `user` to the database.
+* `GET elo.py?user={user}` gets the statistics of user `user`.
+* `POST elo.py?match=1&user1={player}&user2={opp}&res={res}` sends `elo.py` the result of the match between `player` and `opp`, `res` is `1` if `player` wins, `0` if a draw, and `-1` if `opp` wins.
+* `GET elo.py` gets the players of highest rating (capped at 10) to be displayed on the leaderboard.
+
+# Queue System
+
+## Overview of queue system functionality
+One option to start a new esp32 chess game with a stranger is by joining to online queue which matches the most recent two players who entered the queue and starts a pvp game between those players. On high level, when esp32 user selects the "New online game" option in main menu, esp32 will display user's status in queue, which can be either in queue or not in queue, and depending on the user's status it will show options to enter queue, refresh, leave queue, and go back to menu options. Refresh option appears only when the user's status is in queue so that when the user first enters the queue and it is empty, user should have a way to receive a notification that a match has been started when another player enters the queue. To receive that information, our team decided to stick with having refresh options rather than periodic requests which interferes with user's interaction every couple seconds. Furthermore, whenever a game has been found the screen will display a text "Match found!" and the user can find a new pvp game in ongoing games. 
+
+## Implementation
+To implement a queue system, we have a server script called "server.py" which interacts with databases of matches and game ids, so a user can join the online queue by doing a post request to the script. When user posts to enter the queue, the script first checks if the user has an ongoing match which never got updated into user's queue system, it returns the opponnent name with specific token, such that by simply checking if the non-allowed character in user names are in the response esp32 can process it easily. Moreover, if the user is the second player in the queue, a new match starts between 2 players currently in the queue by posting to the "games.py". Thus, now the second player gets a notification immediately and the first player gets a notification when they refresh their queue status. Otherwise, if the queue is empty and the user is the first to join, the script simply add the username into the queue database and wait for another player to join the queue. 
+
+# Ongoing Games System
+
+You may be wondering how the ongoing games system works. It's actually quite simple as a concept. The ongoing games menu simply displays all chess games that the current player is in that is still ongoing, and may select that game in order to enter and see the board and make moves or resign or whatever the player wants to do with that game. It is updated through a refresh button or every time the menu is opened.
+
+For implementation, it utilized the API calls from games.py above, as well as the menu state transitions detailed by the block diagram. In addition, some a C++ class was created to represent an ongoing game for each player, which says the game id, the opponent, and the color of the player. The ongoing games are displayed on the menus through pointers to instances of these classes which are created/updated every time the refresh method is induced (the API call that gets a list of ongoing games a player is involved in).
+
+# Challenge System
+
+You may be wondering how the challenge system works. It's actually quite simple as a concept. Any player is allowed to challenge any other player by scrolling through a list of all ESP32 chess players. Once a challenge is sent, it is seen as an outgoing challenge to the challenger and and incoming challenge to the challenged. The challenger can leave the challenge or remove if it they wish. The challenged can leave it or accept or decline it: whatever they want. If removed or declined, nothing happens and the challenge disappears. If it is accepted, then a new game between the players starts immediately.
+
+For implementation, it utilized the API calls from challenges.py above, as well as the menu state transitions detailed by the block diagram. In addition, some a C++ class was created to represent a challenge for each player, which says whether it is incoming, the game id of the challenge, and who the opponent is. The challenges are displayed on the menus through pointers to instances of these classes which are created/updated every time the refresh method is induced (the API call that gets a list of current challenges a player is involved in).
+
+# ELO and Leaderboard
+
+For ESP32 Chess, we used a rating system called Glicko-2, which is what most online chess websites (such as lichess and chess.com) use. In Glicko-2, each user is assigned a default rating of 1500 and a default rating deviation of 350. After a match is complete, both user's ratings are updated as a function of their current rating and rating deviation, the expected result of their match (this is calculate based on their own rating and their opponents rating), as well as some other factors which help encapsulate rating fluctuation more accurately. I won't talk about the full details of Glicko-2 (since it is actually a bit complicated), but we essentially implemented the system outlined [here](http://www.glicko.net/glicko/glicko2.pdf).
+
+We stored each user's rating and result information, including their rating, number of wins, number of losses, and number of draws, in a ratings database. The exact format of the database is (user text, elo int, rd int, vol int, timing timestamp, wins int, losses int, draws int). Each time a match finishes, the ratings of both opponents are recalculated and their entries in the ratings database are updated with their new respective ratings, wins, losses, etc.. This structuring of the database allows for easy querying of the top users by rating, which we've implemented as a GET request used to display a leaderboard with top rated users locally, and it also allows for easy querying of a user's records, which we've also implemented as a GET request used to display user information (rating, wins, losses, draws) locally on each user's profile.
+
+# Design challenges and decisions
+
+## Refresh button instead of periodic requests
+Our first approach to implementing online player versus player chess game was to have databases on the server and allow users to interact with it post and get requests. Thus, one esp32 could have periodically done requests to keep the board up to date while playing a online game with another player. However, this created a problem that periodic requests interfered with the user's inputs on button presses which resulted a poor gaming experience. Therefore, we decided instead to have a dedicated refresh button in game, so that player can press it to keep the board up to date. Also, in other sections like challenges between players and online system, we kept the standard and used refresh buttons instead of doing periodic requests. 
+
+## Two button state machines
+On one hand, finite state machines with only two buttons may seem trivial because it is not complex as having extra hardwares like keyboards, cursors, and speakers, and etc. On the other hand, having only two buttons was a constraint for us to implement the system function smoothly with only two buttons and we have decided to stick on having this challenge. Therefore, to achieve our goal of playing an online chess game on esp32, we added functionalities like pressing both buttons to escape from game play. 
+
+# Weekly Videos:
+
+## Week 1
+
+![Local Player vs. Player](https://youtu.be/PQNr-ldY_pk)
+![Game Clock](https://youtu.be/syVH13Px1-E)
+![Remote Player vs. Player](https://www.youtube.com/watch?v=KwRK_X1Pp90)
+![ELO Proof of Concept](https://youtu.be/GM5odiHd9tY)
+
+## Week 2
+
+![Ongoing games menu](https://www.youtube.com/watch?v=1ZNBsvDAuXM)
+![Remote Player vs. Player](https://www.youtube.com/watch?v=UF_70pzgye8)
+![Rating Leaderboard](https://youtu.be/6QyxjRK-ct0)
+
+## Week 3
+
+![Clocks, Resigning, and Gameplay](https://youtu.be/0e5NrS7ZoOs)
+![Challenges](https://youtu.be/T-5aXrybi0U)
+![Leaderboard with ESP32 Integration](https://youtu.be/nhMNWSwxGTA)
+
+## Week 4
+
+![Aesthetics, and Board Flipping](https://www.youtube.com/watch?v=48xPDyxVucU)
+![Database Restructuring](https://youtu.be/5YuOSI1--ws)
+![Player profiles and new queue](https://www.youtube.com/watch?v=4Aw17xBLVu8)
+![Refresh, accept/decline/remove challenges](https://youtu.be/ew6n_yW3Zy8)
+
+<style class="fallback">body{visibility:hidden}</style><script>markdeepOptions={tocStyle:'medium'};</script>
+<!-- Markdeep: --><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script>
